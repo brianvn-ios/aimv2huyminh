@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Panel VAnh x HMinh - Free Fire Tool</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{
+    font-family:'Segoe UI',Arial,sans-serif;
+    color:#e0f7ff;
+    background:#00080a;
+    min-height:100vh;
+    overflow:hidden;
+    text-shadow:0 2px 6px rgba(0,0,0,.85);
+  }
+  .bg-photo{
+    position:fixed;inset:0;
+    background:url('https://i.postimg.cc/9XKZjC0r/snapvideo-shareanh-mongdcxhh-xhhh-xhhh-xhhh-dienmongde-2945.jpg') center/cover no-repeat;
+    opacity:.65; z-index:0; pointer-events:none;
+    filter:brightness(1.1) contrast(1.05);
+  }
+  canvas{position:fixed;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
+
+  .screen{
+    position:fixed;inset:0;z-index:10;display:none;
+    justify-content:center;align-items:flex-start;
+    padding:18px 18px 56px 18px;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+  .screen.active{display:flex}
+
+  .glass{
+    position:relative;width:92%;max-width:520px;padding:22px;border-radius:24px;
+    background:rgba(0,15,25,.28);
+    border:1px solid rgba(0,213,255,.3);
+    box-shadow:0 0 45px rgba(0,213,255,.2), inset 0 0 30px rgba(0,213,255,.06);
+    backdrop-filter:blur(34px) saturate(1.4);
+    -webkit-backdrop-filter:blur(34px) saturate(1.4);
+    animation:fadeIn .4s ease;
+    margin-top:10px;margin-bottom:24px;
+  }
+  .glass::before{
+    content:"";position:absolute;inset:-3px;border-radius:27px;
+    background:conic-gradient(from 0deg,#00d5ff,#001f3f,#000810,#001f3f,#00d5ff);
+    z-index:-2;
+  }
+  .glass::after{
+    content:"";position:absolute;inset:3px;border-radius:21px;
+    background:rgba(0,10,18,.55);z-index:-1;
+  }
+  @keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+  h1,h2,h3{text-align:center;font-size:22px;letter-spacing:1px;margin-bottom:8px;
+    background:linear-gradient(90deg,#00d5ff,#00ffcc,#00d5ff);background-size:250%;
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    text-shadow:0 0 20px rgba(0,213,255,.6);
+    animation:bgslide 3s linear infinite;
+  }
+  h3{font-size:18px}
+  @keyframes bgslide{to{background-position:250% center}}
+  .sub{text-align:center;font-size:13px;color:#00d5ff;margin-bottom:18px;text-shadow:0 0 10px rgba(0,213,255,.7)}
+
+  .login-top{display:flex;flex-direction:column;align-items:center;margin-bottom:14px;}
+  .login-avatar{
+    width:130px;height:130px;border-radius:26px;
+    background:url('https://i.postimg.cc/TYNFrkRq/IMG-2252.jpg') center/cover no-repeat;
+    border:3px solid rgba(0,213,255,.55);
+    box-shadow:0 0 24px rgba(0,213,255,.35), inset 0 0 14px rgba(0,213,255,.15);
+  }
+  .login-name{
+    margin-top:10px;font-size:18px;font-weight:800;color:#00d5ff;
+    text-shadow:0 0 10px rgba(0,213,255,.6); letter-spacing:.5px;
+  }
+
+  label{font-weight:700;display:block;margin:14px 0 6px;font-size:14px}
+  input[type="text"],input[type="password"],input[type="number"],select{
+    width:100%;padding:13px;border:none;outline:none;border-radius:14px;
+    background:rgba(0,20,35,.55);color:#e0f7ff;font-size:15px;
+    border:1px solid rgba(0,213,255,.25);box-shadow:inset 0 0 12px rgba(0,213,255,.08);
+  }
+  input::placeholder{color:#88aab8}
+  button.btn{
+    width:100%;margin-top:14px;padding:14px;border:none;border-radius:16px;
+    font-size:16px;font-weight:700;color:#fff;cursor:pointer;
+    background:linear-gradient(90deg,#00c6ff,#0072ff,#00c6ff);background-size:200%;
+    box-shadow:0 0 20px rgba(0,198,255,.45);transition:.2s;
+    animation:shine 2.5s linear infinite;
+  }
+  button.btn:active{transform:scale(.97)}
+  @keyframes shine{to{background-position:200% center}}
+
+  .link-admin{
+    margin-top:14px;text-align:center;font-size:12px;opacity:.9;cursor:pointer;
+    color:#88d4ff;text-decoration:underline;
+  }
+
+  .loading-track{width:100%;height:5px;background:rgba(0,213,255,.15);border-radius:3px;margin-top:16px;overflow:hidden}
+  .loading-fill{height:100%;background:linear-gradient(90deg,#00d5ff,#00ffcc);width:0%;animation:loadRun 2.2s ease-in-out infinite}
+  @keyframes loadRun{0%{width:0%;opacity:1}50%{width:100%;opacity:1}100%{width:100%;opacity:0}}
+
+  .feature-grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;
+  }
+  @media(max-width:480px){.feature-grid{grid-template-columns:1fr}}
+  .feat{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:12px 14px;border-radius:14px;
+    background:linear-gradient(90deg,rgba(0,213,255,.10),rgba(0,100,150,.14));
+    border:1px solid rgba(0,213,255,.18);box-shadow:0 0 10px rgba(0,213,255,.05);
+  }
+  .feat span{font-weight:700;font-size:14px}
+  .switch{position:relative;display:inline-block;width:46px;height:24px}
+  .switch input{opacity:0;width:0;height:0}
+  .slider{
+    position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;
+    background:#051520;border:1px solid rgba(0,213,255,.35);
+    transition:.35s;border-radius:24px;
+  }
+  .slider:before{
+    position:absolute;content:"";height:18px;width:18px;left:3px;bottom:2px;
+    background:#00d5ff;transition:.35s;border-radius:50%;
+    box-shadow:0 0 10px #00d5ff;
+  }
+  input:checked+.slider{background:rgba(0,213,255,.2)}
+  input:checked+.slider:before{transform:translateX(22px)}
+
+  .game-btns{
+    display:flex;gap:16px;justify-content:center;margin-top:18px;flex-wrap:wrap;
+  }
+  .game-icon{
+    width:96px;height:96px;border-radius:22px;
+    background:#0a1a25 center/cover no-repeat;
+    border:2px solid rgba(0,213,255,.35);
+    box-shadow:0 0 20px rgba(0,213,255,.2), 0 6px 18px rgba(0,0,0,.4);
+    cursor:pointer;position:relative;overflow:hidden;
+    transition:transform .2s, box-shadow .2s;
+    display:flex;align-items:flex-end;justify-content:center;
+  }
+  .game-icon:hover{transform:translateY(-4px) scale(1.05); box-shadow:0 0 28px rgba(0,213,255,.35);}
+  .game-icon .glabel{
+    width:100%;text-align:center;font-size:10px;font-weight:800;padding:5px 0;
+    background:rgba(0,0,0,.45);color:#fff;backdrop-filter:blur(4px);
+  }
+  #iconTH{background-image:url('https://i.postimg.cc/XvQftPpf/IMG-2667.jpg')}
+  #iconMAX{background-image:url('https://i.postimg.cc/vHg0fGD5/IMG-2666.jpg')}
+
+  .social-bar{
+    display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px;
+  }
+  .soc{
+    display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:12px;
+    font-size:12px;font-weight:700;color:#fff;text-decoration:none;
+    border:1px solid rgba(255,255,255,.15); backdrop-filter:blur(6px);
+    box-shadow:0 4px 12px rgba(0,0,0,.3); transition:.2s; cursor:pointer;
+  }
+  .soc:hover{transform:translateY(-2px)}
+  .soc.zalo{background:rgba(0,120,255,.25);border-color:rgba(0,150,255,.4)}
+  .soc.tele{background:rgba(0,180,255,.25);border-color:rgba(0,200,255,.4)}
+  .soc.shop{background:rgba(255,100,0,.25);border-color:rgba(255,130,0,.4)}
+  .soc.box{background:rgba(0,200,80,.25);border-color:rgba(0,255,100,.4)}
+  .soc.noti{background:rgba(120,80,255,.25);border-color:rgba(150,100,255,.4)}
+
+  #fpsBox{
+    position:fixed;top:18px;right:18px;z-index:9999;display:none;
+    padding:10px 14px;border-radius:14px;
+    background:rgba(0,10,20,.65);border:1px solid rgba(0,213,255,.4);
+    backdrop-filter:blur(12px);text-align:center;
+    box-shadow:0 0 20px rgba(0,213,255,.3);
+  }
+  #fpsNum{font-size:26px;font-weight:800;color:#00ffcc;text-shadow:0 0 12px #00ffcc;line-height:1}
+  #fpsLabel{font-size:10px;letter-spacing:1px;color:#aaddff}
+
+  #fovOverlay{
+    position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+    display:none;pointer-events:none;z-index:9998;align-items:center;justify-content:center;flex-direction:column;
+  }
+  .fovRing{
+    border:2px solid rgba(0,255,136,.85);
+    box-shadow:0 0 25px rgba(0,255,136,.45), inset 0 0 20px rgba(0,255,136,.15);
+    border-radius:50%;transition:width .1s,height .1s;
+  }
+  .fovText{margin-top:6px;font-size:12px;color:#00ff88;text-shadow:0 0 8px #00ff88;font-weight:700}
+
+  #chOverlay{
+    position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+    width:46px;height:46px;z-index:9997;display:none;pointer-events:none;
+    filter:drop-shadow(0 0 3px #ff0022) drop-shadow(0 0 6px rgba(255,0,34,.5));
+  }
+
+  #termLog{
+    position:fixed;bottom:16px;left:16px;z-index:9996;width:320px;max-width:86vw;
+    padding:12px;border-radius:16px;display:none;flex-direction:column;gap:6px;
+    background:rgba(0,6,12,.75);border:1px solid rgba(0,213,255,.25);
+    backdrop-filter:blur(10px);font-family:'Courier New',monospace;font-size:12px;
+    box-shadow:0 0 25px rgba(0,213,255,.15);
+  }
+  .logline{animation:showLog .25s ease;}
+  @keyframes showLog{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:none}}
+
+  .admin-grid{display:grid;gap:10px;margin-top:12px}
+  .key-row{
+    padding:10px;border-radius:12px;background:rgba(0,20,35,.45);
+    border:1px solid rgba(0,213,255,.18);font-size:13px;
+  }
+  .key-row b{color:#00ffcc}
+  .tag{
+    display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;margin-left:6px;
+    background:rgba(0,213,255,.2);color:#00d5ff;border:1px solid rgba(0,213,255,.3);
+  }
+  .tag.locked{background:rgba(255,0,60,.2);color:#ff4477;border-color:rgba(255,0,60,.4)}
+  .tag.exp{background:rgba(255,170,0,.2);color:#ffcc44;border-color:rgba(255,170,0,.4)}
+  .tag.active{background:rgba(0,255,136,.2);color:#00ff88;border-color:rgba(0,255,136,.4)}
+  .tag.inactive{background:rgba(180,180,180,.2);color:#ccc;border-color:rgba(200,200,200,.3)}
+  .actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+  .actions button{
+    padding:6px 10px;border-radius:10px;border:1px solid rgba(0,213,255,.35);
+    background:rgba(0,20,40,.6);color:#e0f7ff;font-size:12px;cursor:pointer;
+  }
+  .actions button.danger{border-color:rgba(255,50,80,.5);color:#ff88aa}
+  .form-row{display:flex;gap:8px;margin-top:10px}
+  .form-row>input,.form-row>select{flex:1}
+
+  .reset-info{
+    margin-top:12px;padding:12px;border-radius:14px;border:1px solid rgba(0,255,136,.3);
+    background:rgba(0,255,136,.1);display:none;
+  }
+
+  .logout-btn{
+    background:rgba(255,50,80,.2);border:1px solid rgba(255,50,80,.5);
+    color:#ff88aa;box-shadow:0 0 12px rgba(255,50,80,.25);
+  }
+
+  .footer-contact{
+    position:fixed;bottom:0;left:0;right:0;z-index:80;
+    text-align:center;padding:8px 12px;font-size:12px;font-weight:700;color:#00d5ff;
+    background:rgba(0,4,8,.85);border-top:1px solid rgba(0,213,255,.25);
+    backdrop-filter:blur(6px);text-shadow:0 0 8px rgba(0,213,255,.5);
+    letter-spacing:.4px;
+  }
+  .tab-bar{display:flex;gap:8px;margin-bottom:10px}
+  .tab-bar .btn{flex:1;font-size:13px;padding:10px}
+  .section-box{margin:14px 0;padding:12px;border:1px solid rgba(0,213,255,.2);border-radius:14px;background:rgba(0,15,25,.35)}
+  .section-box h4{color:#00d5ff;margin-bottom:8px;font-size:14px}
+</style>
+</head>
+<body>
+
+<div class="bg-photo"></div>
+<canvas id="fxCanvas"></canvas>
+
+<div id="fpsBox"><div id="fpsNum">144</div><div id="fpsLabel">FPS</div></div>
+
+<div id="fovOverlay"><div class="fovRing" id="fovRing"></div><div class="fovText" id="fovTxt">FOV: 90</div></div>
+
+<div id="chOverlay">
+  <svg viewBox="0 0 100 100" width="100%" height="100%">
+    <circle cx="50" cy="50" r="46" fill="none" stroke="#ff1a1a" stroke-width="1.8" stroke-dasharray="28 18" opacity="0.9"/>
+    <circle cx="50" cy="50" r="30" fill="none" stroke="#ff3333" stroke-width="1.2" opacity="0.7"/>
+    <circle cx="50" cy="50" r="4" fill="#ff1a1a"/>
+    <circle cx="50" cy="50" r="1.8" fill="#000"/>
+    <line x1="23" y1="23" x2="32" y2="32" stroke="#ff4d4d" stroke-width="1.6" stroke-linecap="round"/>
+    <line x1="77" y1="23" x2="68" y2="32" stroke="#ff4d4d" stroke-width="1.6" stroke-linecap="round"/>
+    <line x1="23" y1="77" x2="32" y2="68" stroke="#ff4d4d" stroke-width="1.6" stroke-linecap="round"/>
+    <line x1="77" y1="77" x2="68" y2="68" stroke="#ff4d4d" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M46 6 L50 14 L54 6 Z" fill="#ff1a1a"/>
+    <path d="M46 94 L50 86 L54 94 Z" fill="#ff1a1a"/>
+    <path d="M6 46 L14 50 L6 54 Z" fill="#ff1a1a"/>
+    <path d="M94 46 L86 50 L94 54 Z" fill="#ff1a1a"/>
+    <line x1="50" y1="18" x2="50" y2="28" stroke="#ff4d4d" stroke-width="1.2"/>
+    <line x1="50" y1="82" x2="50" y2="72" stroke="#ff4d4d" stroke-width="1.2"/>
+    <line x1="18" y1="50" x2="28" y2="50" stroke="#ff4d4d" stroke-width="1.2"/>
+    <line x1="82" y1="50" x2="72" y2="50" stroke="#ff4d4d" stroke-width="1.2"/>
+  </svg>
+</div>
+
+<div id="termLog"></div>
+
+<div class="footer-contact">Mua hack liên hệ admin</div>
+
+<!-- SCREEN: LOADING -->
+<div class="screen active" id="scr-loading">
+  <div class="glass" style="text-align:center;max-width:380px">
+    <h2 style="font-size:20px;letter-spacing:2px">LOADING DATA FROM SERVER</h2>
+    <div class="sub" style="margin-bottom:6px">Vui lòng chờ trong giây lát...</div>
+    <div class="loading-track"><div class="loading-fill"></div></div>
+    <div style="margin-top:12px;font-size:13px;color:#88d4ff" id="loadDots">Đang tải dữ liệu</div>
+  </div>
+</div>
+
+<!-- SCREEN: LOGIN -->
+<div class="screen" id="scr-login">
+  <div class="glass">
+    <div class="login-top">
+      <div class="login-avatar"></div>
+      <div class="login-name">Phúc is me</div>
+    </div>
+    <h1>Panel VAnh x HMinh</h1>
+    <div class="sub">Free Fire Premium Panel</div>
+    <label>Nhập Key (Chưa có key liên hệ admin)</label>
+    <input type="text" id="inKey" placeholder="" maxlength="24" />
+    <button class="btn" onclick="userLogin()">KÍCH HOẠT</button>
+    <div style="margin-top:10px;font-size:12px;opacity:.8;text-align:center;color:#aaddff" id="loginMsg"></div>
+  </div>
+</div>
+
+<!-- SCREEN: ADMIN -->
+<div class="screen" id="scr-admin">
+  <div class="glass" style="max-width:780px">
+    <h2>SERVER KEY - QUẢN LÝ</h2>
+    <div class="sub">Hệ thống Premium Đỗ Hồng Phúc • Multi-Level Admin</div>
+
+    <!-- LOGIN GATE -->
+    <div id="adminLogin">
+      <div class="sub">Chọn cổng đăng nhập</div>
+      <div class="tab-bar">
+        <button class="btn" onclick="showAdminTab('master')" style="background:linear-gradient(90deg,#00c6ff,#0072ff)">🔑 Master</button>
+        <button class="btn" onclick="showAdminTab('sub')" style="background:linear-gradient(90deg,#00ffcc,#00c6ff)">👤 Sub-Admin</button>
+      </div>
+
+      <div id="tabMaster">
+        <label>Mật khẩu ADMIN</label>
+        <input type="password" id="masterPass" placeholder="Nhập pass" />
+        <button class="btn" onclick="checkMaster()">ĐĂNG NHẬP ADMIN</button>
+      </div>
+
+      <div id="tabSub" style="display:none">
+        <label>Tên đăng nhập Sub-Admin</label>
+        <input type="text" id="subUser" placeholder="Username..." />
+        <label>Mật khẩu</label>
+        <input type="password" id="subPass" placeholder="Password..." />
+        <button class="btn" onclick="checkSubAdmin()">ĐĂNG NHẬP SUB</button>
+      </div>
+
+      <div class="link-admin" onclick="backUser()">← Quay lại User</div>
+    </div>
+
+    <!-- MASTER PANEL -->
+    <div id="masterPanel" style="display:none">
+      <h3 style="margin-bottom:4px">MASTER CONTROL</h3>
+      <div class="sub">Toàn quyền hệ thống</div>
+
+      <div class="section-box">
+        <h4>⚡ Tạo Key (Prefix tùy ý)</h4>
+        <div class="form-row">
+          <input type="text" id="masterPrefixInput" placeholder="Prefix key (VD: DHP, VIP...)" />
+          <select id="masterKeyType">
+            <option value="hour">Key Giờ (+1h)</option>
+            <option value="day">Key Ngày (+1d)</option>
+            <option value="week">Key Tuần (+7d)</option>
+            <option value="month">Key Tháng (+30d)</option>
+            <option value="custom">Tùy ý</option>
+          </select>
+        </div>
+        <div class="form-row" id="customRowMaster" style="display:none">
+          <input type="number" id="customAmountMaster" placeholder="Số" min="1" />
+          <select id="customUnitMaster">
+            <option value="hour">Giờ</option>
+            <option value="day">Ngày</option>
+          </select>
+        </div>
+        <button class="btn" onclick="createMasterKey()">➕ TẠO KEY CHO USER</button>
+      </div>
+
+      <div class="section-box" style="border-color:rgba(255,170,0,.3);background:rgba(255,170,0,.08)">
+        <h4 style="color:#ffcc44">👤 Tạo Sub-Admin / Server Con</h4>
+        <label>Username (đăng nhập cho admin con)</label>
+        <input type="text" id="newSubUser" placeholder="VD: admin1" />
+        <label>Password</label>
+        <input type="text" id="newSubPass" placeholder="VD: 123456" />
+        <label>Prefix Key mặc định cho admin con</label>
+        <input type="text" id="newSubPrefix" placeholder="VD: VIP, PRO, ACE..." />
+        <button class="btn" onclick="createSubAdmin()" style="background:linear-gradient(90deg,#ffaa00,#ff7700)">➕ TẠO SERVER CON</button>
+      </div>
+
+      <div style="font-weight:700;color:#00d5ff;margin:12px 0 6px">📋 Danh sách Sub-Admin / Server Con</div>
+      <div class="admin-grid" id="subAdminList" style="margin-bottom:14px"></div>
+
+      <div style="font-weight:700;color:#00d5ff;margin-bottom:6px">🔑 Toàn bộ Key hệ thống</div>
+      <div class="admin-grid" id="masterKeyList"></div>
+
+      <button class="btn logout-btn" onclick="adminLogout()" style="margin-top:14px">THOÁT MASTER</button>
+    </div>
+
+    <!-- SUB PANEL -->
+    <div id="subPanel" style="display:none">
+      <h3 id="subPanelTitle" style="margin-bottom:4px">SUB PANEL</h3>
+      <div class="sub">Quản lý key cá nhân</div>
+
+      <div class="section-box">
+        <h4>➕ Tạo Key (Prefix tùy ý)</h4>
+        <input type="text" id="subPrefixInput" placeholder="Prefix key muốn tạo..." />
+        <div class="form-row" style="margin-top:8px">
+          <select id="subKeyType">
+            <option value="hour">Key Giờ (+1h)</option>
+            <option value="day">Key Ngày (+1d)</option>
+            <option value="week">Key Tuần (+7d)</option>
+            <option value="month">Key Tháng (+30d)</option>
+            <option value="custom">Tùy ý</option>
+          </select>
+        </div>
+        <div class="form-row" id="customRowSub" style="display:none">
+          <input type="number" id="customAmountSub" placeholder="Số" min="1" />
+          <select id="customUnitSub">
+            <option value="hour">Giờ</option>
+            <option value="day">Ngày</option>
+          </select>
+        </div>
+        <button class="btn" onclick="createSubKey()">➕ TẠO KEY</button>
+      </div>
+
+      <div style="font-weight:700;color:#00d5ff;margin:12px 0 6px">📋 Keys bạn đã tạo</div>
+      <div class="admin-grid" id="subKeyList"></div>
+
+      <button class="btn logout-btn" onclick="adminLogout()" style="margin-top:14px">THOÁT SUB</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- SCREEN: DASHBOARD -->
+<div class="screen" id="scr-dash">
+  <div class="glass" style="max-width:540px">
+    <h1>Panel VAnh x HMinh</h1>
+    <div class="sub">Huy Minh IOS • Premium</div>
+
+    <div class="feature-grid">
+      <div class="feat"><span>🏹 NHẸ TÂM</span><label class="switch"><input type="checkbox" onchange="toggleF('lightAim',this)"><span class="slider"></span></label></div>
+      <div class="feat"><span>⚡ FIX LAG</span><label class="switch"><input type="checkbox" onchange="toggleF('fixLag',this)"><span class="slider"></span></label></div>
+      <div class="feat"><span>📳 FIX RUNG</span><label class="switch"><input type="checkbox" onchange="toggleF('fixShake',this)"><span class="slider"></span></label></div>
+      <div class="feat"><span>🚀 TỐI ƯU MÁY</span><label class="switch"><input type="checkbox" onchange="toggleF('optimize',this)"><span class="slider"></span></label></div>
+      <div class="feat"><span>🎯 AIMHEAD</span><label class="switch"><input type="checkbox" onchange="toggleF('aimHead',this)"><span class="slider"></span></label></div>
+      <div class="feat"><span>🔇 AIM SILENT</span><label class="switch"><input type="checkbox" onchange="toggleF('aimSilent',this)"><span class="slider"></span></label></div>
+      <div class="feat"><span>🔥 TÂM ẢO</span><label class="switch"><input type="checkbox" id="tgCross" onchange="toggleF('crosshair',this)"><span class="slider"></span></label></div>
+      <div class="feat"><span>📐 AIM FOV</span><label class="switch"><input type="checkbox" id="tgFov" onchange="toggleF('aimFov',this)"><span class="slider"></span></label></div>
+    </div>
+
+    <div id="fovControl" style="display:none;margin-top:10px;padding:12px;border-radius:14px;background:rgba(0,20,35,.4);border:1px solid rgba(0,255,136,.25)">
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:#00ff88;margin-bottom:6px">
+        <span>Điều chỉnh FOV</span><span id="fovVal">90</span>
+      </div>
+      <input type="range" id="fovRange" min="0" max="360" value="90" style="width:100%" oninput="updateFov(this.value)">
+    </div>
+
+    <div class="feat" style="margin-top:12px">
+      <span>🎮 FPS Counter</span>
+      <label class="switch"><input type="checkbox" id="tgFps" onchange="toggleF('fpsShow',this)"><span class="slider"></span></label>
+    </div>
+
+    <div class="game-btns">
+      <div class="game-icon" id="iconTH" onclick="openGame('th')" title="Free Fire TH"><div class="glabel">FF TH</div></div>
+      <div class="game-icon" id="iconMAX" onclick="openGame('max')" title="Free Fire MAX"><div class="glabel">FF MAX</div></div>
+    </div>
+
+    <div class="social-bar">
+      <a class="soc zalo" onclick="openLink('http://zalo.me/84799825514')">💬 Zalo Admin 1</a>
+      <a class="soc tele" onclick="openLink('http://zalo.me/84378881167')">💬 Zalo Admin 2</a>
+      <a class="soc box" onclick="openLink('https://www.tiktok.com/@vt43765?_r=1&_t=ZS-96GTxIecmvq')">Tiktok Admin 1</a>
+      <a class="soc noti" onclick="openLink('https://www.tiktok.com/@huyminh.loveyoutiktok?_r=1&_t=ZS-96BumzmRTfN')">Tiktok Admin 1</a>
+
+    <button class="btn logout-btn" onclick="logout()" style="margin-top:14px">THOÁT</button>
+  </div>
+</div>
+
+<script>
+  /* ================= AUDIO ================= */
+  function playBootSound(){
+    try{
+      const Ctx=window.AudioContext||window.webkitAudioContext;
+      if(!Ctx) return;
+      const a=new Ctx();
+      const o=a.createOscillator();
+      const g=a.createGain();
+      o.connect(g); g.connect(a.destination);
+      o.type='sine';
+      o.frequency.setValueAtTime(520,a.currentTime);
+      o.frequency.exponentialRampToValueAtTime(1040,a.currentTime+0.12);
+      g.gain.setValueAtTime(0.08,a.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+0.35);
+      o.start(); o.stop(a.currentTime+0.35);
+      setTimeout
+      setTimeout(()=>{if(a.state!=='closed') a.close();},500);
+    }catch(e){}
+  }
+
+
+/* ================= DATA & STORAGE ================= */
+
+// SERVER API
+const SERVER_URL = "https://royal-dust-4a79.tranphat1357t.workers.dev";
+
+// DEVICE ID
+let deviceId =
+  localStorage.getItem("HEADLOCK_DEVICE_ID") || generateDeviceId();
+
+function generateDeviceId() {
+  const id =
+    "HEADLOCK-" +
+    Date.now() +
+    "-" +
+    Math.random().toString(36).substr(2, 9);
+
+  localStorage.setItem("HEADLOCK_DEVICE_ID", id);
+
+  return id;
+}
+
+/* ================= API FUNCTIONS ================= */
+
+// LẤY TOÀN BỘ KEY
+async function getKeys() {
+  try {
+    const r = await fetch(SERVER_URL + "/keys");
+    return await r.json();
+  } catch (e) {
+    return [];
+  }
+}
+
+// SAVE KEY
+async function saveKeys(data) {
+  await fetch(SERVER_URL + "/keys", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+}
+
+// LẤY SUB ADMIN
+async function getSubs() {
+  try {
+    const r = await fetch(SERVER_URL + "/subs");
+    return await r.json();
+  } catch (e) {
+    return [];
+  }
+}
+
+// SAVE SUB ADMIN
+async function saveSubs(data) {
+  await fetch(SERVER_URL + "/subs", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+}
+
+/* ================= ACTIVATE KEY API ================= */
+
+async function activateKey(key) {
+  try {
+    const res = await fetch(`${SERVER_URL}/api/activate`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        key: key.trim(),
+        deviceId: deviceId,
+      }),
+    });
+
+    if (!res.ok) {
+      return {
+        success: false,
+        data: {
+          message: `Server lỗi (${res.status})`,
+        },
+      };
+    }
+
+    const data = await res.json();
+
+    return {
+      success: data.ok === true || data.valid === true,
+      data: data,
+    };
+  } catch (err) {
+    console.error(err);
+
+    return {
+      success: false,
+      data: {
+        message: "Không kết nối được server!",
+      },
+    };
+  }
+}
+
+function switchScreen(id) {
+  document.querySelectorAll(".screen").forEach((s) =>
+    s.classList.remove("active")
+  );
+
+  const t = document.getElementById(id);
+
+  if (t) t.classList.add("active");
+
+  window.scrollTo(0, 0);
+}
+
+/* ================= USER LOGIN ================= */
+
+async function userLogin() {
+  const val = document
+    .getElementById("inKey")
+    .value.trim()
+    .toUpperCase();
+
+  const msg = document.getElementById("loginMsg");
+
+  if (!val) {
+    msg.textContent = "Vui lòng nhập key";
+    return;
+  }
+
+  msg.textContent = "Đang kiểm tra key...";
+
+  const result = await activateKey(val);
+
+  if (!result.success) {
+    msg.textContent =
+      result.data.message || "Key không hợp lệ!";
+    return;
+  }
+
+  currentKey = val;
+  isLoggedIn = true;
+
+  sessionStorage.setItem("dhp_session", val);
+
+  msg.textContent = "Đăng nhập thành công!";
+
+  switchScreen("scr-dash");
+
+  startMatrix();
+}
+
+/* ================= LOGOUT ================= */
+
+function logout() {
+  sessionStorage.removeItem("dhp_session");
+
+  isLoggedIn = false;
+  currentKey = "";
+
+  stopMatrix();
+
+  switchScreen("scr-login");
+}
+  function logout(){sessionStorage.removeItem('dhp_session');stopMatrix();switchScreen('scr-login');}
+  function backUser(){switchScreen('scr-login');}
+
+  /* ================= ADMIN GATE ================= */
+  function openAdmin(){switchScreen('scr-admin');}
+  function adminLogout(){
+    document.getElementById('masterPanel').style.display='none';
+    document.getElementById('subPanel').style.display='none';
+    document.getElementById('adminLogin').style.display='block';
+    document.getElementById('masterPass').value='';
+    document.getElementById('subUser').value='';
+    document.getElementById('subPass').value='';
+    currentSub='';
+    backUser();
+  }
+
+  function showAdminTab(tab){
+    document.getElementById('tabMaster').style.display=tab==='master'?'block':'none';
+    document.getElementById('tabSub').style.display=tab==='sub'?'block':'none';
+  }
+
+  document.getElementById('masterKeyType').addEventListener('change',e=>{
+    document.getElementById('customRowMaster').style.display=e.target.value==='custom'?'flex':'none';
+  });
+  document.getElementById('subKeyType').addEventListener('change',e=>{
+    document.getElementById('customRowSub').style.display=e.target.value==='custom'?'flex':'none';
+  });
+
+  function msFromType(type,isMaster){
+    let ms=86400000;
+    if(type==='hour') ms=3600000;
+    if(type==='week') ms=604800000;
+    if(type==='month') ms=2592000000;
+    if(type==='custom'){
+      const amt=parseInt(document.getElementById(isMaster?'customAmountMaster':'customAmountSub').value||'1');
+      const unit=document.getElementById(isMaster?'customUnitMaster':'customUnitSub').value;
+      ms=(unit==='hour'?3600000:86400000)*amt;
+    }
+    return ms;
+  }
+
+  /* ================= MASTER ================= */
+  function checkMaster(){
+    const pass=document.getElementById('masterPass').value.trim();
+    if(pass!=='DHPADMIN'){alert('Sai mật khẩu ADMIN!');return;}
+    document.getElementById('adminLogin').style.display='none';
+    document.getElementById('masterPanel').style.display='block';
+    renderMasterKeys(); renderSubAdmins();
+  }
+
+  async function createMasterKey(){
+    let prefix=document.getElementById('masterPrefixInput').value.trim().toUpperCase();
+    if(!prefix) prefix='DHP';
+    if(prefix.length>10){alert('Prefix tối đa 10 ký tự');return;}
+    const type=document.getElementById('masterKeyType').value;
+    const ms=msFromType(type,true);
+    const keyStr=prefix+Math.random().toString(36).substring(2,8).toUpperCase();
+    const keys = await getKeys();
+    if(keys.some(x=>x.key===keyStr)){alert('Key trùng lặp, vui lòng thử lại');return;}
+    keys.unshift({
+      key:keyStr,
+      type:(type==='custom'?('custom '+(document.getElementById('customAmountMaster').value||'1')+(document.getElementById('customUnitMaster').value==='hour'?'h':'d')):type),
+      created:Date.now(), expires:Date.now()+ms, durationMs:ms,
+      resetCount:0, locked:false, status:'inactive', deviceId:null, owner:'master'
+    });
+    await saveKeys(keys); await renderMasterKeys();
+  }
+
+  async function renderMasterKeys(){
+    const box=document.getElementById('masterKeyList');
+    const keys = await getKeys();
+    box.innerHTML='';
+    if(!keys.length){box.innerHTML='<div style="text-align:center;opacity:.7">Không có key nào</div>';return;}
+    keys.forEach(k=>{
+      const expired=Date.now()>k.expires;
+      let cls='inactive', txt='CHƯA HOẠT ĐỘNG';
+      if(k.locked){cls='locked';txt='ĐÃ KHÓA';}
+      else if(expired){cls='exp';txt='HẾT HẠN';}
+      else if(k.status==='active'){cls='active';txt='ĐANG HOẠT ĐỘNG';}
+      const div=document.createElement('div'); div.className='key-row';
+      div.innerHTML=`<div><b>${k.key}</b> <span class="tag ${cls}">${txt}</span> <span class="tag" style="opacity:.8">${k.owner||'master'}</span></div>
+      <div style="margin-top:4px;opacity:.85">Loại: ${k.type} • Hết hạn: ${new Date(k.expires).toLocaleString('vi-VN')} • Reset: ${k.resetCount}/3</div>
+      <div class="actions">
+        <button onclick="addDayKey('${k.key}',1)">+1 Ngày</button>
+        <button onclick="subDayKey('${k.key}',1)">-1 Ngày</button>
+        <button onclick="resetKeyByStr('${k.key}')">↻ Reset</button>
+        <button class="danger" onclick="lockKeyByStr('${k.key}')">${k.locked?'Mở khóa':'Khóa'}</button>
+        <button class="danger" onclick="delKeyByStr('${k.key}')">🗑 Xóa</button>
+      </div>`;
+      box.appendChild(div);
+    });
+  }
+
+  /* ================= SUB-ADMIN / SERVER CON ================= */
+  async function createSubAdmin(){
+    const u=document.getElementById('newSubUser').value.trim();
+    const p=document.getElementById('newSubPass').value.trim();
+    const prefix=document.getElementById('newSubPrefix').value.trim().toUpperCase();
+    if(!u||!p){alert('Nhập đủ Username và Password');return;}
+    const subs=getSubs();
+    if(subs.some(x=>x.username===u)){alert('Username đã tồn tại!');return;}
+    subs.push({username:u, password:p, prefix:prefix||'SUB', createdAt:Date.now(), active:true});
+    await saveSubs(subs);
+    await renderSubAdmins();
+    alert('Tạo Sub-Admin (Server Con) thành công!');
+  }
+
+  async function renderSubAdmins(){
+    const box=document.getElementById('subAdminList');
+    const subs = await getSubs();
+    box.innerHTML='';
+    if(!subs.length){box.innerHTML='<div style="text-align:center;opacity:.7">Chưa có Sub-Admin</div>';return;}
+    subs.forEach((s,i)=>{
+      const div=document.createElement('div'); div.className='key-row';
+      div.innerHTML=`<div><b>${s.username}</b> <span class="tag ${s.active===false?'locked':'active'}">${s.active===false?'BỊ KHÓA':'HOẠT ĐỘNG'}</span></div>
+      <div style="margin-top:4px;opacity:.85">Prefix mặc định: ${s.prefix||'—'} • Tạo: ${new Date(s.createdAt).toLocaleString('vi-VN')}</div>
+      <div class="actions">
+        <button class="danger" onclick="kickSub(${i})">🗑 Xóa / Kick</button>
+      </div>`;
+      box.appendChild(div);
+    });
+  }
+
+  async function kickSub(i){
+  if(!confirm('Xóa Sub-Admin này?')) return;
+
+  const subs = await getSubs();
+  const target = subs[i].username;
+
+  subs.splice(i,1);
+  await saveSubs(subs);
+
+  const keys = await getKeys();
+  const newKeys = keys.filter(k => k.owner !== target);
+
+  await saveKeys(newKeys);
+
+  await renderSubAdmins();
+  await renderMasterKeys();
+
+  if(currentSub === target){
+    adminLogout();
+  }
+}
+
+  async function checkSubAdmin(){
+    const u=document.getElementById('subUser').value.trim();
+    const p=document.getElementById('subPass').value.trim();
+    const subs = await getSubs();
+    const sub=subs.find(x=>x.username===u && x.password===p && x.active!==false);
+    if(!sub){alert('Sai tài khoản / mật khẩu hoặc đã bị khóa!');return;}
+    currentSub=sub.username;
+    document.getElementById('adminLogin').style.display='none';
+    document.getElementById('subPanel').style.display='block';
+    document.getElementById('subPanelTitle').innerText='SUB PANEL - '+sub.username.toUpperCase();
+    renderSubKeys();
+  }
+
+  async function createSubKey(){
+    let prefix=document.getElementById('subPrefixInput').value.trim().toUpperCase();
+    if(!prefix){
+        const subs = await getSubs();
+        const sub=subs.find(x=>x.username===currentSub);
+        prefix=sub?(sub.prefix||'SUB'):'SUB';
+    }
+    if(prefix.length>10){alert('Prefix tối đa 10 ký tự');return;}
+    const type=document.getElementById('subKeyType').value;
+    const ms=msFromType(type,false);
+    const keyStr=prefix+Math.random().toString(36).substring(2,8).toUpperCase();
+    const keys = await getKeys();
+    if(keys.some(x=>x.key===keyStr)){alert('Key trùng lặp, vui lòng thử lại');return;}
+    keys.unshift({
+      key:keyStr,
+      type:(type==='custom'?('custom '+(document.getElementById('customAmountSub').value||'1')+(document.getElementById('customUnitSub').value==='hour'?'h':'d')):type),
+      created:Date.now(), expires:Date.now()+ms, durationMs:ms,
+      resetCount:0, locked:false, status:'inactive', deviceId:null, owner:currentSub
+    });
+    await saveKeys(keys);
+    await renderSubKeys();
+  }
+
+  async function renderSubKeys(){
+    const box=document.getElementById('subKeyList');
+    const all = await getKeys();
+    box.innerHTML='';
+    if(!all.length){box.innerHTML='<div style="text-align:center;opacity:.7">Bạn chưa tạo key nào</div>';return;}
+    all.filter(k => k.owner === currentSub).forEach(k=>{
+      const expired=Date.now()>k.expires;
+      let cls='inactive', txt='CHƯA HOẠT ĐỘNG';
+      if(k.locked){cls='locked';txt='ĐÃ KHÓA';}
+      else if(expired){cls='exp';txt='HẾT HẠN';}
+      else if(k.status==='active'){cls='active';txt='ĐANG HOẠT ĐỘNG';}
+      const div=document.createElement('div'); div.className='key-row';
+      div.innerHTML=`<div><b>${k.key}</b> <span class="tag ${cls}">${txt}</span></div>
+      <div style="margin-top:4px;opacity:.85">Loại: ${k.type} • Hết hạn: ${new Date(k.expires).toLocaleString('vi-VN')} • Reset: ${k.resetCount}/3</div>
+      <div class="actions">
+        <button onclick="addDayKey('${k.key}',1)">+1 Ngày</button>
+        <button onclick="subDayKey('${k.key}',1)">-1 Ngày</button>
+        <button onclick="resetKeyByStr('${k.key}')">↻ Reset</button>
+        <button class="danger" onclick="lockKeyByStr('${k.key}')">${k.locked?'Mở khóa':'Khóa'}</button>
+        <button class="danger" onclick="delKeyByStr('${k.key}')">🗑 Xóa</button>
+      </div>`;
+      box.appendChild(div);
+    });
+  }
+
+  /* ================= KEY ACTIONS ================= */
+  async function addDayKey(keyStr,n){
+    const keys = await getKeys();
+    const k = keys.find(x=>x.key===keyStr);
+    if(k){k.expires+=86400000*n; await saveKeys(keys); await refreshAllLists();}
+  }
+  async function subDayKey(keyStr,n){
+    const keys = await getKeys();
+    const k = keys.find(x=>x.key===keyStr);
+    if(k){k.expires-=86400000*n; await saveKeys(keys); await refreshAllLists();}
+  }
+  async function resetKeyByStr(keyStr){
+    const keys = await getKeys();
+    const k = keys.find(x=>x.key===keyStr);
+    if(!k) return;
+    if(k.locked){alert('Key đang bị khóa!');return;}
+    k.resetCount++;
+    if(k.resetCount>=3){k.locked=true;}
+    k.expires=Date.now()+(k.durationMs||86400000);
+    k.status='inactive'; k.deviceId=null;
+    await saveKeys(keys);
+    await refreshAllLists();
+    alert('Reset key '+keyStr+' thành công! Đếm reset: '+k.resetCount+'/3');
+  }
+  async function lockKeyByStr(keyStr){
+    const keys = await getKeys();
+    const k = keys.find(x=>x.key===keyStr);
+    if(k){k.locked=!k.locked; await saveKeys(keys); await refreshAllLists();}
+  }
+  async function delKeyByStr(keyStr){
+    if(!confirm('Xóa key '+keyStr+'?')) return;
+    const keys = await getKeys();
+    const updatedKeys = keys.filter(x=>x.key!==keyStr);
+    await saveKeys(updatedKeys);
+    await refreshAllLists();
+  }
+  async function refreshAllLists(){
+    if(document.getElementById('masterPanel').style.display!=='none') await renderMasterKeys();
+    if(document.getElementById('subPanel').style.display!=='none') await renderSubKeys();
+    await renderSubAdmins();
+  }
+
+  /* ================= FEATURES / OVERLAYS ================= */
+  let activeF={}; let logTimers={};
+  const logs={
+    lightAim:['[LIGHTAIM] Load config...','[LIGHTAIM] Reduce recoil 38%','[LIGHTAIM] Stability patch OK','[LIGHTAIM] Loop stabilize...'],
+    fixLag:['[FIXLAG] Scanning memory...','[FIXLAG] Clean cache 420MB','[FIXLAG] Reduce latency','[FIXLAG] Ping optimized'],
+    fixShake:['[FIXSHAKE] Disable shake flag','[FIXSHAKE] Camera locked','[FIXSHAKE] Smooth ON'],
+    optimize:['[OPTIMIZE] Boost CPU/GPU','[OPTIMIZE] Kill bg process','[OPTIMIZE] Ram freed','[OPTIMIZE] Thermal OK'],
+    aimHead:['[AIMHEAD] Scan target...','[AIMHEAD] Head lock enable','[AIMHEAD] Predict ON'],
+    aimSilent:['[AIMSILENT] No spread ON','[AIMSILENT] Silent loaded','[AIMSILENT] Safe mode'],
+    crosshair:['[CROSS] Render overlay...','[CROSS] Center locked','[CROSS] Sync display'],
+    aimFov:['[FOV] Build FOV circle','[FOV] Radius set','[FOV] Scan sector'],
+    fpsShow:['[FPS] Monitor ON','[FPS] Refresh rate sync','[FPS] Display loaded']
+  };
+
+  function toggleF(name,el){
+    activeF[name]=el.checked;
+    const term=document.getElementById('termLog');
+    term.style.display=Object.values(activeF).some(Boolean)?'flex':'none';
+    if(name==='crosshair') document.getElementById('chOverlay').style.display=el.checked?'block':'none';
+    if(name==='fpsShow') document.getElementById('fpsBox').style.display=el.checked?'block':'none';
+    if(name==='aimFov'){
+      document.getElementById('fovOverlay').style.display=el.checked?'flex':'none';
+      document.getElementById('fovControl').style.display=el.checked?'block':'none';
+    }
+    if(el.checked){
+      if(logTimers[name]) clearInterval(logTimers[name]);
+      logTimers[name]=setInterval(()=>pushLog(name),900);
+      pushLog(name+'_ON');
+    }else{
+      if(logTimers[name]){clearInterval(logTimers[name]);delete logTimers[name];}
+    }
+  }
+  function pushLog(name){
+    const box=document.getElementById('termLog');
+    const isOn=name.endsWith('_ON');
+    const base=name.replace('_ON','');
+    const arr=logs[base]||['[SYSTEM] Processing...'];
+    const txt=isOn?(`[${base.toUpperCase()}] ✅ ACTIVATED`):(arr[Math.floor(Math.random()*arr.length)]);
+    const div=document.createElement('div'); div.className='logline'; div.textContent=txt;
+    box.appendChild(div);
+    if(box.children.length>8) box.removeChild(box.firstChild);
+    box.scrollTop=box.scrollHeight;
+  }
+  function updateFov(v){
+    document.getElementById('fovVal').textContent=v;
+    document.getElementById('fovTxt').textContent='FOV: '+v;
+    const ring=document.getElementById('fovRing');
+    const px=Math.max(40,parseInt(v));
+    ring.style.width=px+'px'; ring.style.height=px+'px';
+  }
+
+  /* random FPS */
+  setInterval(()=>{
+    if(!activeF['fpsShow']) return;
+    const n=Math.floor(Math.random()*900)+60;
+    document.getElementById('fpsNum').textContent=n;
+  },400);
+
+  function openGame(v){
+    if(v==='th') window.location.href='freefire://';
+    else window.location.href='freefiremax://';
+  }
+  function openLink(url){window.open(url,'_blank');}
+
+  /* ================= PARTICLES + MATRIX RAIN ================= */
+  const cvs=document.getElementById('fxCanvas');
+  const ctx=cvs.getContext('2d');
+  let W,H,particles=[],matrixOn=false,matrixId;
+
+  function resize(){
+    W=cvs.width=window.innerWidth; H=cvs.height=window.innerHeight;
+    particles=[]; for(let i=0;i<50;i++) particles.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.6,vy:(Math.random()-.5)*.6,r:Math.random()*1.8+1});
+  }
+  window.addEventListener('resize',resize); resize();
+
+  function drawParticles(){
+    for(let p of particles){
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0||p.x>W) p.vx*=-1; if(p.y<0||p.y>H) p.vy*=-1;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fillStyle='rgba(0,213,255,.5)'; ctx.fill();
+    }
+    for(let i=0;i<particles.length;i++) for(let j=i+1;j<particles.length;j++){
+      const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y, d=Math.sqrt(dx*dx+dy*dy);
+      if(d<140){ctx.beginPath();ctx.strokeStyle=`rgba(0,213,255,${1-d/140})`;ctx.lineWidth=.5;ctx.moveTo(particles[i].x,particles[i].y);ctx.lineTo(particles[j].x,particles[j].y);ctx.stroke();}
+    }
+  }
+  function startMatrix(){
+    if(matrixOn) return; matrixOn=true;
+    const cols=Math.floor(W/16); let drops=[]; for(let i=0;i<cols;i++) drops[i]=Math.random()*-50;
+    const chars='01ABCDEF<>;/[]DHP_$#@&!?';
+    matrixId=setInterval(()=>{
+      ctx.fillStyle='rgba(0,8,12,.12)';
+      ctx.fillRect(0,0,W,H);
+      ctx.fillStyle='#00d5ff'; ctx.font='700 13px monospace';
+      for(let i=0;i<drops.length;i++){
+        const txt=chars[Math.floor(Math.random()*chars.length)];
+        ctx.fillText(txt,i*16,drops[i]*16);
+        if(drops[i]*16>H && Math.random()>.975) drops[i]=0;
+        drops[i]++;
+      }
+      drawParticles();
+    },50);
+  }
+  function stopMatrix(){matrixOn=false;clearInterval(matrixId);ctx.clearRect(0,0,W,H);}
+
+  /* ================= BOOT ================= */
+  window.addEventListener('DOMContentLoaded',()=>{
+    playBootSound();
+    const dotsEl=document.getElementById('loadDots');
+    let dotCount=0;
+    const dotInterval=setInterval(()=>{
+      dotCount=(dotCount+1)%4;
+      if(dotsEl) dotsEl.textContent='Đang tải dữ liệu'+'.'.repeat(dotCount);
+    },400);
+    setTimeout(()=>{
+      clearInterval(dotInterval);
+      const ld=document.getElementById('scr-loading');
+      if(ld && ld.classList.contains('active')){
+        ld.classList.remove('active');
+        document.getElementById('scr-login').classList.add('active');
+      }
+    },2600);
+  });
+</script>
+</body>
+</html>
