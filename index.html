@@ -65,7 +65,7 @@
   .login-top{display:flex;flex-direction:column;align-items:center;margin-bottom:14px;}
   .login-avatar{
     width:130px;height:130px;border-radius:26px;
-    background:url('https://i.postimg.cc/TYNFrkRq/IMG-2252.jpg') center/cover no-repeat;
+    background:url('https://sf-static.upanhlaylink.com/img/image_202605114a4d139bda20946afb663612ba853859.jpg') center/cover no-repeat;
     border:3px solid rgba(0,213,255,.55);
     box-shadow:0 0 24px rgba(0,213,255,.35), inset 0 0 14px rgba(0,213,255,.15);
   }
@@ -455,9 +455,10 @@
 
     <div class="social-bar">
       <a class="soc zalo" onclick="openLink('http://zalo.me/84799825514')">💬 Zalo Admin 1</a>
-      <a class="soc tele" onclick="openLink('http://zalo.me/84378881167')">💬 Zalo Admin 2</a>
+      <a class="soc zalo2" onclick="openLink('http://zalo.me/84378881167')">💬 Zalo Admin 2</a>
       <a class="soc box" onclick="openLink('https://www.tiktok.com/@vt43765?_r=1&_t=ZS-96GTxIecmvq')">Tiktok Admin 1</a>
       <a class="soc noti" onclick="openLink('https://www.tiktok.com/@huyminh.loveyoutiktok?_r=1&_t=ZS-96BumzmRTfN')">Tiktok Admin 1</a>
+      <a class="tele" onclick="openLink('https://web.telegram.org/k/#@Sowbinjey')">Telegram</a>
 
     <button class="btn logout-btn" onclick="logout()" style="margin-top:14px">THOÁT</button>
   </div>
@@ -607,6 +608,7 @@ function switchScreen(id) {
 /* ================= USER LOGIN ================= */
 
 async function userLogin() {
+
   const val = document
     .getElementById("inKey")
     .value.trim()
@@ -634,6 +636,9 @@ async function userLogin() {
 
   sessionStorage.setItem("dhp_session", val);
 
+  // lưu key
+  saveSession(val);
+
   msg.textContent = "Đăng nhập thành công!";
 
   switchScreen("scr-dash");
@@ -643,10 +648,14 @@ async function userLogin() {
 
 /* ================= LOGOUT ================= */
 
-function logout() {
+function logout(){
+
   sessionStorage.removeItem("dhp_session");
 
+  clearSavedSession();
+
   isLoggedIn = false;
+
   currentKey = "";
 
   stopMatrix();
@@ -1006,24 +1015,82 @@ function logout() {
   }
   function stopMatrix(){matrixOn=false;clearInterval(matrixId);ctx.clearRect(0,0,W,H);}
 
-  /* ================= BOOT ================= */
-  window.addEventListener('DOMContentLoaded',()=>{
-    playBootSound();
-    const dotsEl=document.getElementById('loadDots');
-    let dotCount=0;
-    const dotInterval=setInterval(()=>{
-      dotCount=(dotCount+1)%4;
-      if(dotsEl) dotsEl.textContent='Đang tải dữ liệu'+'.'.repeat(dotCount);
-    },400);
-    setTimeout(()=>{
+ /* ================= AUTO SAVE LOGIN ================= */
+
+function saveSession(key){
+  localStorage.setItem("saved_key", key);
+}
+
+function getSavedSession(){
+  return localStorage.getItem("saved_key");
+}
+
+function clearSavedSession(){
+  localStorage.removeItem("saved_key");
+}
+
+/* ================= BOOT ================= */
+
+window.addEventListener('DOMContentLoaded', async ()=>{
+
+  playBootSound();
+
+  const dotsEl=document.getElementById('loadDots');
+
+  let dotCount=0;
+
+  const dotInterval=setInterval(()=>{
+    dotCount=(dotCount+1)%4;
+
+    if(dotsEl){
+      dotsEl.textContent='Đang tải dữ liệu'+'.'.repeat(dotCount);
+    }
+
+  },400);
+
+  // kiểm tra key đã lưu
+  const savedKey = getSavedSession();
+
+  if(savedKey){
+
+    const result = await activateKey(savedKey);
+
+    if(result.success){
+
+      currentKey = savedKey;
+      isLoggedIn = true;
+
+      sessionStorage.setItem("dhp_session", savedKey);
+
       clearInterval(dotInterval);
-      const ld=document.getElementById('scr-loading');
-      if(ld && ld.classList.contains('active')){
-        ld.classList.remove('active');
-        document.getElementById('scr-login').classList.add('active');
-      }
-    },2600);
-  });
+
+      document.getElementById('scr-loading').classList.remove('active');
+
+      document.getElementById('scr-dash').classList.add('active');
+
+      startMatrix();
+
+      return;
+    }else{
+      clearSavedSession();
+    }
+  }
+
+  setTimeout(()=>{
+
+    clearInterval(dotInterval);
+
+    const ld=document.getElementById('scr-loading');
+
+    if(ld && ld.classList.contains('active')){
+      ld.classList.remove('active');
+
+      document.getElementById('scr-login').classList.add('active');
+    }
+
+  },2600);
+
+});
 </script>
 </body>
 </html>
