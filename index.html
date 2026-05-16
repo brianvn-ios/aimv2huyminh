@@ -465,23 +465,31 @@
 </div>
 <script type="module">
   /* ================= AUDIO ================= */
-  function playBootSound(){
-    try{
-      const Ctx=window.AudioContext||window.webkitAudioContext;
-      if(!Ctx) return;
-      const a=new Ctx();
-      const o=a.createOscillator();
-      const g=a.createGain();
-      o.connect(g); g.connect(a.destination);
-      o.type='sine';
-      o.frequency.setValueAtTime(520,a.currentTime);
-      o.frequency.exponentialRampToValueAtTime(1040,a.currentTime+0.12);
-      g.gain.setValueAtTime(0.08,a.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+0.35);
-      o.start(); o.stop(a.currentTime+0.35);
-      setTimeout
-    }catch(e){}
-  }
+function playBootSound(){
+  try{
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if(!Ctx) return;
+
+    const a = new Ctx();
+    const o = a.createOscillator();
+    const g = a.createGain();
+
+    o.connect(g);
+    g.connect(a.destination);
+
+    o.type = 'sine';
+
+    o.frequency.setValueAtTime(520, a.currentTime);
+    o.frequency.exponentialRampToValueAtTime(1040, a.currentTime + 0.12);
+
+    g.gain.setValueAtTime(0.08, a.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, a.currentTime + 0.35);
+
+    o.start();
+    o.stop(a.currentTime + 0.35);
+
+  }catch(e){}
+}
 
 
 /* ================= DATA & STORAGE ================= */
@@ -496,16 +504,28 @@ import {
 /* ================= FIREBASE CONFIG ================= */
 
 const firebaseConfig = {
-  apiKey: "API_KEY",
-  authDomain: "PROJECT_ID.firebaseapp.com",
-  projectId: "PROJECT_ID",
-  storageBucket: "PROJECT_ID.appspot.com",
-  messagingSenderId: "SENDER_ID",
-  appId: "APP_ID"
+
+  apiKey: "AIzaSyCG0gzMq1UDYH-_iCjexsJuy1OY9qQLD1E",
+
+  authDomain: "serverkey-e7cc6.firebaseapp.com",
+
+  databaseURL: "https://serverkey-e7cc6-default-rtdb.firebaseio.com",
+
+  projectId: "serverkey-e7cc6",
+
+  storageBucket: "serverkey-e7cc6.firebasestorage.app",
+
+  messagingSenderId: "744043128336",
+
+  appId: "1:744043128336:web:2ec4b145220d3c7bbacc95"
+
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+let currentKey = "";
+let isLoggedIn = false;
+let currentSub = "";
 
 /* ================= DEVICE ID ================= */
 
@@ -628,21 +648,7 @@ async function activateKey(key) {
     }
   };
 }
-// DEVICE ID
-let deviceId =
-  localStorage.getItem("HEADLOCK_DEVICE_ID") || generateDeviceId();
 
-function generateDeviceId() {
-  const id =
-    "HEADLOCK-" +
-    Date.now() +
-    "-" +
-    Math.random().toString(36).substr(2, 9);
-
-  localStorage.setItem("HEADLOCK_DEVICE_ID", id);
-
-  return id;
-}
 
 /* ================= API FUNCTIONS ================= */
 
@@ -715,7 +721,6 @@ function logout(){
 
   switchScreen("scr-login");
 }
-  function logout(){sessionStorage.removeItem('dhp_session');stopMatrix();switchScreen('scr-login');}
   function backUser(){switchScreen('scr-login');}
 
   /* ================= ADMIN GATE ================= */
