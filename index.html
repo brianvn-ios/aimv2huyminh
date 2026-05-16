@@ -488,8 +488,151 @@
 /* ================= DATA & STORAGE ================= */
 
 // SERVER API
-const SERVER_URL = "https://serverkeyhuyminh.quannguyendinh508.workers.dev";
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+/* ================= FIREBASE CONFIG ================= */
+
+const firebaseConfig = {
+  apiKey: "API_KEY",
+  authDomain: "PROJECT_ID.firebaseapp.com",
+  projectId: "PROJECT_ID",
+  storageBucket: "PROJECT_ID.appspot.com",
+  messagingSenderId: "SENDER_ID",
+  appId: "APP_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+/* ================= DEVICE ID ================= */
+
+let deviceId =
+  localStorage.getItem("HEADLOCK_DEVICE_ID") || generateDeviceId();
+
+function generateDeviceId() {
+  const id =
+    "HEADLOCK-" +
+    Date.now() +
+    "-" +
+    Math.random().toString(36).substr(2, 9);
+
+  localStorage.setItem("HEADLOCK_DEVICE_ID", id);
+
+  return id;
+}
+
+/* ================= FIREBASE STORAGE ================= */
+
+// GET KEYS
+async function getKeys() {
+  try {
+    const snap = await getDoc(doc(db, "panel", "keys"));
+
+    if (!snap.exists()) return [];
+
+    return snap.data().list || [];
+  } catch (e) {
+    console.error(e);
+    return [];
+  }
+}
+
+// SAVE KEYS
+async function saveKeys(data) {
+  await setDoc(doc(db, "panel", "keys"), {
+    list: data
+  });
+}
+
+// GET SUB ADMINS
+async function getSubs() {
+  try {
+    const snap = await getDoc(doc(db, "panel", "subs"));
+
+    if (!snap.exists()) return [];
+
+    return snap.data().list || [];
+  } catch (e) {
+    console.error(e);
+    return [];
+  }
+}
+
+// SAVE SUB ADMINS
+async function saveSubs(data) {
+  await setDoc(doc(db, "panel", "subs"), {
+    list: data
+  });
+}
+
+/* ================= ACTIVATE KEY ================= */
+
+async function activateKey(key) {
+
+  const keys = await getKeys();
+
+  const found = keys.find(
+    x => x.key === key.trim().toUpperCase()
+  );
+
+  if (!found) {
+    return {
+      success: false,
+      data: {
+        message: "Key không tồn tại!"
+      }
+    };
+  }
+
+  if (found.locked) {
+    return {
+      success: false,
+      data: {
+        message: "Key đã bị khóa!"
+      }
+    };
+  }
+
+  if (Date.now() > found.expires) {
+    return {
+      success: false,
+      data: {
+        message: "Key đã hết hạn!"
+      }
+    };
+  }
+
+  // khóa device
+  if (found.deviceId && found.deviceId !== deviceId) {
+    return {
+      success: false,
+      data: {
+        message: "Key đã được dùng trên thiết bị khác!"
+      }
+    };
+  }
+
+  // active
+  found.deviceId = deviceId;
+  found.status = "active";
+
+  await saveKeys(keys);
+
+  return {
+    success: true,
+    data: {
+      message: "Kích hoạt thành công!"
+    }
+  };
+}
 // DEVICE ID
 let deviceId =
   localStorage.getItem("HEADLOCK_DEVICE_ID") || generateDeviceId();
@@ -507,90 +650,6 @@ function generateDeviceId() {
 }
 
 /* ================= API FUNCTIONS ================= */
-
-// LẤY TOÀN BỘ KEY
-async function getKeys() {
-  try {
-    const r = await fetch(SERVER_URL + "/keys");
-    return await r.json();
-  } catch (e) {
-    return [];
-  }
-}
-
-// SAVE KEY
-async function saveKeys(data) {
-  await fetch(SERVER_URL + "/keys", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
-}
-
-// LẤY SUB ADMIN
-async function getSubs() {
-  try {
-    const r = await fetch(SERVER_URL + "/subs");
-    return await r.json();
-  } catch (e) {
-    return [];
-  }
-}
-
-// SAVE SUB ADMIN
-async function saveSubs(data) {
-  await fetch(SERVER_URL + "/subs", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
-}
-
-/* ================= ACTIVATE KEY API ================= */
-
-async function activateKey(key) {
-  try {
-    const res = await fetch(`${SERVER_URL}/api/activate`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        key: key.trim(),
-        deviceId: deviceId,
-      }),
-    });
-
-    if (!res.ok) {
-      return {
-        success: false,
-        data: {
-          message: `Server lỗi (${res.status})`,
-        },
-      };
-    }
-
-    const data = await res.json();
-
-    return {
-      success: data.ok === true || data.valid === true,
-      data: data,
-    };
-  } catch (err) {
-    console.error(err);
-
-    return {
-      success: false,
-      data: {
-        message: "Không kết nối được server!",
-      },
-    };
-  }
-}
 
 function switchScreen(id) {
   document.querySelectorAll(".screen").forEach((s) =>
