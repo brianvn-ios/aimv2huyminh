@@ -463,7 +463,7 @@
 <button class="btn logout-btn" onclick="logout()" style="margin-top:14px">THOÁT</button>
   </div>
 </div>
-<script>
+<script type="module">
   /* ================= AUDIO ================= */
 function playBootSound(){
   try{
@@ -546,10 +546,12 @@ function generateDeviceId() {
 
 /* ================= FIREBASE STORAGE ================= */
 
+/* ================= FIREBASE STORAGE ================= */
+
 // GET KEYS
 async function getKeys() {
   try {
-    const snap = await db.collection("panel").doc("keys").get();
+    const snap = await getDoc(doc(db, "panel", "keys"));
 
     if (!snap.exists()) return [];
 
@@ -562,9 +564,10 @@ async function getKeys() {
 
 // SAVE KEYS
 async function saveKeys(data) {
-  await db.collection("panel").doc("keys").set({
-  list: data
-});
+  await setDoc(doc(db, "panel", "keys"), {
+    list: data
+  });
+}
 
 // GET SUB ADMINS
 async function getSubs() {
