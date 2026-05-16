@@ -462,8 +462,7 @@
     <button class="btn logout-btn" onclick="logout()" style="margin-top:14px">THOÁT</button>
   </div>
 </div>
-
-<script>
+<script type="module">
   /* ================= AUDIO ================= */
   function playBootSound(){
     try{
@@ -486,10 +485,6 @@
 
 
 /* ================= DATA & STORAGE ================= */
-
-// SERVER API
-<!-- FIREBASE -->
-<script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
   getFirestore,
@@ -819,7 +814,7 @@ function logout(){
     const p=document.getElementById('newSubPass').value.trim();
     const prefix=document.getElementById('newSubPrefix').value.trim().toUpperCase();
     if(!u||!p){alert('Nhập đủ Username và Password');return;}
-    const subs=getSubs();
+    const subs = await getSubs();
     if(subs.some(x=>x.username===u)){alert('Username đã tồn tại!');return;}
     subs.push({username:u, password:p, prefix:prefix||'SUB', createdAt:Date.now(), active:true});
     await saveSubs(subs);
