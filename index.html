@@ -463,7 +463,7 @@
 <button class="btn logout-btn" onclick="logout()" style="margin-top:14px">THOÁT</button>
   </div>
 </div>
-<script>
+<script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
@@ -1152,6 +1152,31 @@ window.addEventListener('DOMContentLoaded', async ()=>{
   },2600);
 
 });
+ /* ===== EXPORT FUNCTIONS TO WINDOW ===== */
+window.userLogin = userLogin;
+window.logout = logout;
+window.backUser = backUser;
+
+window.showAdminTab = showAdminTab;
+window.checkMaster = checkMaster;
+window.createMasterKey = createMasterKey;
+window.createSubAdmin = createSubAdmin;
+window.checkSubAdmin = checkSubAdmin;
+window.createSubKey = createSubKey;
+
+window.addDayKey = addDayKey;
+window.subDayKey = subDayKey;
+window.resetKeyByStr = resetKeyByStr;
+window.lockKeyByStr = lockKeyByStr;
+window.delKeyByStr = delKeyByStr;
+window.kickSub = kickSub;
+
+window.toggleF = toggleF;
+window.updateFov = updateFov;
+window.openGame = openGame;
+window.openLink = openLink;
+
+window.adminLogout = adminLogout;
 </script>
 </body>
 </html>
