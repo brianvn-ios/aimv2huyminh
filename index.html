@@ -602,7 +602,7 @@ async function saveSubs(data) {
 
 /* ================= ACTIVATE KEY ================= */
 
-async function activateKey(key) {
+async function activateKey(key, autoCheck = false) {
 
   const keys = await getKeys();
 
@@ -619,7 +619,8 @@ async function activateKey(key) {
     };
   }
 
-  if (found.locked) {
+  // check khóa
+  if (found.locked === true) {
     return {
       success: false,
       data: {
@@ -628,7 +629,13 @@ async function activateKey(key) {
     };
   }
 
-  if (Date.now() > found.expires) {
+  // check hết hạn
+  if (Date.now() > Number(found.expires || 0)) {
+
+    found.status = "expired";
+
+    await saveKeys(keys);
+
     return {
       success: false,
       data: {
@@ -637,19 +644,36 @@ async function activateKey(key) {
     };
   }
 
-  // khóa device
-  if (found.deviceId && found.deviceId !== deviceId) {
+  // nếu key đã bind máy khác
+  if (
+    found.deviceId &&
+    found.deviceId !== deviceId
+  ) {
     return {
       success: false,
       data: {
-        message: "Key đã được dùng trên thiết bị khác!"
+        message: "Key đã được sử dụng trên thiết bị khác!"
       }
     };
   }
 
-  // active
-  found.deviceId = deviceId;
+  // AUTO CHECK thì không ghi DB liên tục
+  if (autoCheck) {
+    return {
+      success: true,
+      data: {
+        message: "Auto login success"
+      }
+    };
+  }
+
+  // bind device lần đầu
+  if (!found.deviceId) {
+    found.deviceId = deviceId;
+  }
+
   found.status = "active";
+  found.lastLogin = Date.now();
 
   await saveKeys(keys);
 
@@ -796,7 +820,7 @@ function logout(){
     if(prefix.length>10){alert('Prefix tối đa 10 ký tự');return;}
     const type=document.getElementById('masterKeyType').value;
     const ms=msFromType(type,true);
-    const keyStr=prefix+Math.random().toString(36).substring(2,8).toUpperCase();
+    const keyStr=prefix+crypto.randomUUID().split('-')[0].toUpperCase().toUpperCase();
     const keys = await getKeys();
     if(keys.some(x=>x.key===keyStr)){alert('Key trùng lặp, vui lòng thử lại');return;}
     keys.unshift({
@@ -1131,7 +1155,7 @@ window.addEventListener('DOMContentLoaded', async ()=>{
 
   if(savedKey){
 
-    const result = await activateKey(savedKey);
+    const result = await activateKey(savedKey, true);
 
     if(result.success){
 
