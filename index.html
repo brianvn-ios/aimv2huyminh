@@ -553,16 +553,31 @@ function generateDeviceId() {
 async function getKeys() {
   try {
 
-    const snap = await Promise.race([
-      getDoc(doc(db, "panel", "keys")),
-      new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("timeout")), 8000)
-      )
-    ]);
+    const snap = await getDoc(doc(db, "panel", "keys"));
 
-    if (!snap.exists()) return [];
+    // nếu chưa có document thì tự tạo
+    if (!snap.exists()) {
 
-    return snap.data().list || [];
+      await setDoc(doc(db, "panel", "keys"), {
+        list: []
+      });
+
+      return [];
+    }
+
+    const data = snap.data();
+
+    // chống lỗi field list bị undefined
+    if (!data.list || !Array.isArray(data.list)) {
+
+      await setDoc(doc(db, "panel", "keys"), {
+        list: []
+      });
+
+      return [];
+    }
+
+    return data.list;
 
   } catch (e) {
 
