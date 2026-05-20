@@ -552,13 +552,22 @@ function generateDeviceId() {
 // GET KEYS
 async function getKeys() {
   try {
-    const snap = await getDoc(doc(db, "panel", "keys"));
+
+    const snap = await Promise.race([
+      getDoc(doc(db, "panel", "keys")),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("timeout")), 8000)
+      )
+    ]);
 
     if (!snap.exists()) return [];
 
     return snap.data().list || [];
+
   } catch (e) {
-    console.error(e);
+
+    console.error("Firebase lỗi:", e);
+
     return [];
   }
 }
@@ -685,27 +694,35 @@ async function userLogin() {
 
   msg.textContent = "Đang kiểm tra key...";
 
-  const result = await activateKey(val);
+  try {
 
-  if (!result.success) {
-    msg.textContent =
-      result.data.message || "Key không hợp lệ!";
-    return;
+    const result = await activateKey(val);
+
+    if (!result.success) {
+      msg.textContent =
+        result.data.message || "Key không hợp lệ!";
+      return;
+    }
+
+    currentKey = val;
+    isLoggedIn = true;
+
+    sessionStorage.setItem("dhp_session", val);
+
+    saveSession(val);
+
+    msg.textContent = "Đăng nhập thành công!";
+
+    switchScreen("scr-dash");
+
+    startMatrix();
+
+  } catch (e) {
+
+    console.error(e);
+
+    msg.textContent = "Không kết nối được Firebase!";
   }
-
-  currentKey = val;
-  isLoggedIn = true;
-
-  sessionStorage.setItem("dhp_session", val);
-
-  // lưu key
-  saveSession(val);
-
-  msg.textContent = "Đăng nhập thành công!";
-
-  switchScreen("scr-dash");
-
-  startMatrix();
 }
 
 /* ================= LOGOUT ================= */
